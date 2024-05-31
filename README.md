@@ -1,4 +1,3 @@
-# ubiquitous-NOVO-journey
 Start
 # Yahoo Finance Dashboard
 
