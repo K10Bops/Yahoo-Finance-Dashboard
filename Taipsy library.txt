@@ -1,0 +1,3 @@
+# New competitor to streamlit 
+# Taipy, an open-source Python framework
+# https://github.com/Avaiga/taipy/?utm_source=LinkedIn%20Influencer&utm_campaign=Alex%20Wang
