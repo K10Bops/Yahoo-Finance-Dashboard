@@ -13,6 +13,7 @@ import requests as req
 import redditwarp.SYNC
 import time
 import urllib
+import io
 
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
@@ -113,7 +114,27 @@ class YFinance:
         return ret
 #==============================================================================
 
-ticker_list = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]['Symbol']      
+@st.cache_data(ttl=86400)
+def get_sp500_tickers():
+    """
+    Fetch the current S&P 500 ticker list from Wikipedia.
+    Wikipedia blocks requests without a browser-like User-Agent (returns HTTP 403),
+    so we fetch the HTML ourselves via `requests` before handing it to pd.read_html.
+    Falls back to a small hardcoded list if the fetch fails for any reason
+    (network restrictions, Wikipedia layout changes, rate limiting, etc.).
+    """
+    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+    try:
+        response = req.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        tables = pd.read_html(io.StringIO(response.text))
+        return tables[0]['Symbol'].tolist()
+    except Exception as e:
+        st.sidebar.warning(f"Couldn't fetch live S&P 500 list ({e}); using fallback list.")
+        return ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'META', 'NVDA', 'TSLA', 'BRK-B', 'JPM', 'V']
+
+ticker_list = get_sp500_tickers()
 #ticker_key = "unique_ticker_key"  # Unique key for the ticker selectbox , key=ticker_key
 ticker = st.sidebar.selectbox("Choose Your Stock", ticker_list)
 
@@ -666,8 +687,3 @@ with colb:
 ###############################################################################
 # END
 ###############################################################################
-    
-
-
-
-
