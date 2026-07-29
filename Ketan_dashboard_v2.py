@@ -17,7 +17,6 @@ import urllib
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 
-st.set_option('deprecation.showPyplotGlobalUse', False )
 st.set_page_config(layout='wide')
 #==============================================================================
 # HOT FIX FOR YFINANCE .INFO METHOD
@@ -475,11 +474,13 @@ def render_tab4():
     
     # Plotting the simulation results
     st.subheader('Simulation Results')
+    fig, ax = plt.subplots()
     for i in range(num_simulations):
-        plt.plot(simulated_prices[:, i])
-    plt.xlabel('Time')
-    plt.ylabel('Price')
-    st.pyplot(plt.show())
+        ax.plot(simulated_prices[:, i])
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Price')
+    st.pyplot(fig)
+    plt.close(fig)
   
     
   
